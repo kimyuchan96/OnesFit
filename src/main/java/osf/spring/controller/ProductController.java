@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -133,12 +134,12 @@ public class ProductController {
 		List<CartDTO> carts = new ArrayList<>();
 		MemberDTO mdto = (MemberDTO)session.getAttribute("loginInfo");
 		int result=0;
-		String pseq=req.getParameter("pseq");
+		int pseq=Integer.parseInt(req.getParameter("pseq"));
 		String size=req.getParameter("option1");			
 		String color=req.getParameter("option2");
 		String amount = req.getParameter("amounts");
 		int length = Integer.parseInt(req.getParameter("length"));
-
+		ProductDTO pdto = pservice.productSelectByPseq(pseq);
 		JsonArray sizes=JsonParser.parseString(size).getAsJsonArray();
 		JsonArray colors=JsonParser.parseString(color).getAsJsonArray();
 		JsonArray amounts=JsonParser.parseString(amount).getAsJsonArray();
@@ -146,8 +147,11 @@ public class ProductController {
 		for(int j =0;j<length;j++) {
 			CartDTO cdto=new CartDTO();
 			cdto.setParent_id(mdto.getId());
-			cdto.setPseq(Integer.parseInt(pseq));
+			cdto.setPseq(pseq);
 			cdto.setOption1(sizes.get(j).getAsString());
+			cdto.setPname(pdto.getPname());
+			cdto.setPrice(pdto.getPrice()*amounts.get(j).getAsInt());
+			cdto.setTitle_img(pdto.getTitle_img());
 			cdto.setOption2(colors.get(j).getAsString());
 			cdto.setCount_item(Integer.parseInt(amounts.get(j).getAsString()));			
 			carts.add(cdto);
@@ -170,16 +174,13 @@ public class ProductController {
 
 		model.addAttribute("pdto", pdto);
 
-		String[] color = req.getParameterValues("color");
-		System.out.println(color[0]+" : "+color[1]);
+		String[] color = req.getParameterValues("color");		
 		req.setAttribute("list1", color);
 
-		String[] size = req.getParameterValues("size");
-		System.out.println(size[0]+" : "+size[1]);
+		String[] size = req.getParameterValues("size");		
 		req.setAttribute("list2", size);
 
-		String[] amount = req.getParameterValues("amount");
-		System.out.println(amount[0]+" : "+amount[1]);
+		String[] amount = req.getParameterValues("amount");		
 		req.setAttribute("list3", amount);
 
 		String sum = req.getParameter("sum");
@@ -256,5 +257,18 @@ public class ProductController {
 	      
 	      return "redirect:/product/productDetail?pseq="+pseq;
 	   }
+	
+	@RequestMapping(value="memberInfo",produces="application/text;charset=UTF-8")
+	@ResponseBody
+	public String memberInfo() {
+		MemberDTO mdto = (MemberDTO)session.getAttribute("loginInfo");
+		String[] email = mdto.getEmail().split("@");
+		Gson member= new Gson();
+		JsonObject obj = new JsonObject();
+		obj.addProperty("email1", email[0]);
+		obj.addProperty("email2", email[1]);
+		obj.addProperty("member", member.toJson(mdto));
+		return obj.toString();
+	}
 
 }

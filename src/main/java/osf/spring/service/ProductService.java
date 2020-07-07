@@ -26,7 +26,7 @@ public class ProductService {
 		pdto.setPseq(seq);
 		pdao.productRegist(pdto);
 		for(ImageDTO dto : imageList) {
-			dto.setImg_seq(seq);
+			dto.setProduct_seq(seq);
 			pdao.imageRegist(dto);
 		}
 	}

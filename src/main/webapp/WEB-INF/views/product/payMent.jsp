@@ -26,6 +26,12 @@
 	src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <script
 	src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+	window.onload = function() { //실행될 코드 }
+		$(".sum").val(${sum});
+		$(".totalPrice").val(${sum}+3000);
+	}
+	</script>
 </head>
 <style>
 * {
@@ -131,7 +137,7 @@ div {
 	height: 50px;
 }
 
-#input {
+#add2 {
 	width: 200px
 }
 
@@ -246,6 +252,17 @@ div {
 	border: hidden;
 	text-align: center;
 }
+
+.sum {
+	border: 0px;
+	outline: 0;
+	width: 35px;
+}
+.totalPrice {
+	border: 0px;
+	outline: 0;
+
+}
 </style>
 <body>
 	<!--       전체 영역-->
@@ -336,36 +353,40 @@ div {
 								</thead>
 
 								<tbody>
-								<c:forEach var="list1" items="${list1 }" varStatus="status">
-									<tr>
-										<td class=""><input type="checkbox"></td>
-										<td>
-											<div>
-												<img src="/mainpic/${pdto.title_img }" style="width: 100%">
-											</div>
-										</td>
-										<td><input type="text" class="pinput" name="pname"
-											value="${pdto.pname }" style="width: 50px;"
-											readonly="readonly"> <br> <br> Size : <input
-											type="text" class="pinput" name="psize" value="${list2[status.index]}"
-											style="width: 15px" readonly="readonly"><br>
-											Color : <input type="text" class="pinput" name="pcolor"
-											value="${list1}" style="width: 30px" readonly="readonly"></td>
-										<td><input type="text" class="pinput" name="price"
-											value="${pdto.price }" style="width: 40px"
-											readonly="readonly"></td>
-										<td><input type="text" class="pinput" name="amount"
-											value="${list3[status.index]}" style="width: 30px" readonly="readonly"></td>
-										<td>0</td>
-										<td>${list3[status.index] *pdto.price }원</td>
-									</tr>
+									<c:forEach var="list1" items="${list1 }" varStatus="status">
+										<tr>
+											<td><input type="checkbox" class='selectPro'></td>
+											<td>
+												<div>
+													<img src="/mainpic/${pdto.title_img }" style="width: 100%">
+												</div>
+											</td>
+											<td><input type="text" class="pinput" name="pname"
+												value="${pdto.pname }" style="width: 50px;"
+												readonly="readonly"> <br> <br> Size : <input
+												type="text" class="pinput" name="psize"
+												value="${list2[status.index]}" style="width: 15px"
+												readonly="readonly"><br> Color : <input
+												type="text" class="pinput" name="pcolor" value="${list1}"
+												style="width: 30px" readonly="readonly"></td>
+											<td><input type="text" class="pinput" name="price"
+												value="${pdto.price }" style="width: 40px"
+												readonly="readonly"></td>
+											<td><input type="text" class="pinput" name="amount"
+												value="${list3[status.index]}" style="width: 30px"
+												readonly="readonly"></td>
+											<td>0</td>
+											<td class='amount'>${list3[status.index] *pdto.price }</td>
+										</tr>
 									</c:forEach>
 								</tbody>
 
 								<tfoot>
 									<tr>
 										<td colspan="7" style="text-align: right;">[기본배송] 상품구매금액
-											${sum } + 배송비 3,000 - 상품할인금액 0 = 합계 : KRW ${sum+3000 }</td>
+											<input type=text class='sum' readonly>+ 배송비 3,000 -
+											상품할인금액 0 = 합계 :<input type='text' class='totalPrice' readonly>
+										</td>
 									</tr>
 								</tfoot>
 
@@ -373,9 +394,9 @@ div {
 						</div>
 						<br>
 						<div>
-							<a href=""><button type="button"
-									class="btn btn-outline-secondary"
-									style="width: 70px; height: 28px; font-size: 11px;">삭제하기</button></a>
+							<button type="button" id='delete'
+								class="btn btn-outline-secondary"
+								style="width: 70px; height: 28px; font-size: 11px;">삭제하기</button>
 						</div>
 						<br> <br>
 
@@ -393,9 +414,10 @@ div {
 											<th style="width: 150px">배송지 선택</th>
 											<td>
 												<div class="address">
-													<input type="button" class="obtn" value="회원 정보와 동일 "> <input
-														type='reset' class="obtn" value="새로운 배송지"> <input
-														type="button" class="obtn" value="최근 배송지 "> <a href=""><input
+													<input type="button" class="obtn" value="회원 정보와 동일 "
+														id='memberInput'> <input type='reset' class="obtn"
+														value="새로운 배송지"> <input type="button" class="obtn"
+														value="최근 배송지 "> <a href=""><input
 														type="button" class="obtn" value="주소록 보기 "></a>
 												</div>
 											</td>
@@ -413,7 +435,7 @@ div {
 												우편번호 <br> <input type="text" readonly id="add1"
 												name="address1" name="address1"
 												style="margin-bottom: 3px; margin-top: 3px; width: 200px">
-												기본주소<br> <input id="input" name=address2 class=add2>
+												기본주소<br> <input id="add2" name=address2 class=add2>
 												상세주소</td>
 
 
@@ -421,8 +443,8 @@ div {
 										</tr>
 										<tr class="">
 											<th scope="row">휴대전화
-											<td><input type="text"  name="phone"
-												class="phone" style="border: 1px solid #dedede;text-align:center;">
+											<td><input type="text" name="phone" class="phone"
+												style="border: 1px solid #dedede; text-align: center;">
 										</tr>
 
 									</tbody>
@@ -519,7 +541,7 @@ div {
 
 										<p class="price" style="font-size: 20px">
 											KRW<input style="text-align: right; border: 0px;" size="5"
-												readonly="1" value="${sum+3000 } 원" type="text">
+												readonly="1" class='totalPrice' type="text">
 										</p>
 										<input id="radio" type="checkbox" class="checkbox"> <label>결제정보를
 											확인하였으며, 구매진행에 동의합니다.</label>
@@ -828,6 +850,42 @@ div {
 				return true;
 			}
 		}
+		$("#memberInput").on("click", function() {
+			$.ajax({
+				url : "memberInfo",
+				dataType : "json",
+				contentType : "application/json;charset=utf-8"
+			}).done(function(resp) {
+				var member = JSON.parse(resp.member);
+				$(".recipient").val(member.name);
+				$("#zipcode").val(member.zipcode);
+				$("#add1").val(member.address1);
+				$("#add2").val(member.address2);
+				$(".phone").val(member.phone);
+				$("#email1").val(resp.email1);
+				$("#email2").val(resp.email2);
+				$("#dname").val(member.name);
+			})
+		})
+		$("#delete").on("click", function() {
+			var check = confirm("선택하신 상품을 삭제하시겠습니까?");
+			if(check){
+			$(".selectPro:checked").each(function() {
+					$(this).parent("td").parent("tr").remove();
+					var amount = $.map($('.amount'), function (el) { return el.innerText; });
+					if(amount.length>0){
+						var money=0;
+						for(var i=0;i<amount.length;i++){					
+							money += Number(amount[i]);					
+						}
+						$(".sum").val(money);
+						$(".totalPrice").val(money+3000);
+					}else{
+						location.href="/";
+					}
+				})
+			}
+		})
 	</script>
 </body>
 </html>

@@ -11,7 +11,7 @@
 	</update>
 	<update id="imageRegist">
 		insert into product_img
-		values(#{img_seq},#{oriname},#{sysname})
+		values(#{product_seq},#{oriname},#{sysname})
 	</update>
 	<select id="productSelect"
 		resultType="osf.spring.dto.ProductDTO">
@@ -27,7 +27,7 @@
 	</select>
 	<update id="cartAdd">
 		insert into cart
-		values(cart_seq.nextval,#{parent_id},#{pseq},#{option1},#{option2},#{count_item})
+		values(cart_seq.nextval,#{parent_id},#{pseq},#{title_img},#{pname},#{option1},#{option2},#{count_item},#{price})
 	</update>
 	<select id="optionSelect" resultType="osf.spring.dto.OptionDTO">
 		select *from product_option

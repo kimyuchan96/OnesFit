@@ -1,25 +1,25 @@
 package osf.spring.dto;
 
 public class ImageDTO {
-	private int img_seq;
+	private int product_seq;
 	private String oriname;
 	private String sysname;
 	
 	public ImageDTO() {}
 	
-	public ImageDTO(int img_seq, String oriname, String sysname) {
+	public ImageDTO(int product_seq, String oriname, String sysname) {
 		super();
-		this.img_seq = img_seq;
+		this.product_seq = product_seq;
 		this.oriname = oriname;
 		this.sysname = sysname;
 	}
 
-	public int getImg_seq() {
-		return img_seq;
+	public int getProduct_seq() {
+		return product_seq;
 	}
 
-	public void setImg_seq(int img_seq) {
-		this.img_seq = img_seq;
+	public void setProduct_seq(int product_seq) {
+		this.product_seq = product_seq;
 	}
 
 	public String getOriname() {
