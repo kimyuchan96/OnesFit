@@ -21,7 +21,7 @@ public class HomeController {
 		List<ProductDTO> products = pservice.productSelectAll();
 		model.addAttribute("products", products);
 		
-		return "home";
+		return "index";
 	}
 	
 }

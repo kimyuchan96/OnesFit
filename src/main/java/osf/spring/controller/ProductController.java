@@ -22,13 +22,16 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import osf.spring.dao.ProductDAO;
 import osf.spring.dto.BuyListDTO;
 import osf.spring.dto.CartDTO;
 import osf.spring.dto.ImageDTO;
 import osf.spring.dto.ImagesDTO;
 import osf.spring.dto.MemberDTO;
 import osf.spring.dto.OptionDTO;
+import osf.spring.dto.OrderDTO;
 import osf.spring.dto.ProductDTO;
+import osf.spring.dto.QuestionDTO;
 import osf.spring.dto.ReviewDTO;
 import osf.spring.service.ProductService;
 
@@ -38,6 +41,9 @@ public class ProductController {
 
 	@Autowired
 	private ProductService pservice;
+
+	@Autowired
+	private ProductDAO pdao;
 
 	@Autowired
 	private HttpSession session;
@@ -52,12 +58,13 @@ public class ProductController {
 	}
 
 	@RequestMapping("productRegistComplete")
-	public String productRegistComplete(ProductDTO pdto,MultipartFile file,ImagesDTO images)throws Exception {
+	public String productRegistComplete(ProductDTO pdto,MultipartFile file,ImagesDTO images)throws Exception {		
+		int pseq = pdao.getNextVal();
 		UUID uuid = UUID.randomUUID();
 		List<ImageDTO> imageList = new ArrayList<>();
 		System.out.println(pdto.getPname()+" : "+pdto.getPrice()+" : "+pdto.getContent());
-		String filePath=session.getServletContext().getRealPath("upload/mainpic");
-		String filePath2=session.getServletContext().getRealPath("upload/subpic");
+		String filePath=session.getServletContext().getRealPath("upload/product/title");
+		String filePath2=session.getServletContext().getRealPath("upload/product/"+pseq);
 		pdto.setPname(pdto.getPname().replaceAll("<", "&lt"));
 		pdto.setContent(pdto.getContent().replaceAll("<", "&lt"));
 		File folder1=new File(filePath);
@@ -87,7 +94,7 @@ public class ProductController {
 				}
 			}
 		}
-
+		pdto.setPseq(pseq);
 		pservice.productRegist(pdto, imageList);
 
 		return "redirect:/";
@@ -103,13 +110,15 @@ public class ProductController {
 		List<ImageDTO> idto = pservice.ImageSelectByPseq(pseq);
 		List<OptionDTO> options = pservice.optionSelect(pseq);
 		HashSet<String> color = new HashSet<String>();		
-		
-		 List<ReviewDTO> rdto = pservice.ReviewtByPseq(pseq);
-	      model.addAttribute("rdto", rdto);
+
+		List<ReviewDTO> rdto = pservice.ReviewtByPseq(pseq);
+		model.addAttribute("rdto", rdto);
 
 
 		model.addAttribute("pdto", pdto);
 		model.addAttribute("idto", idto);
+		List<QuestionDTO> qdto = pservice.QuestionByPseq(pseq);
+		model.addAttribute("qdto", qdto);
 		for(OptionDTO dto:options) {
 			color.add(dto.getColor());			
 		}
@@ -166,12 +175,12 @@ public class ProductController {
 
 	@RequestMapping(value="payMent", method=RequestMethod.POST)
 	public String payMent(HttpServletRequest req, Model model) throws Exception {
-
+		MemberDTO mdto = (MemberDTO)session.getAttribute("loginInfo");
 		int pseq=0;
 		try{pseq = Integer.parseInt(req.getParameter("pseq"));}catch(Exception e){}
 
 		ProductDTO pdto = pservice.productSelectByPseq(pseq);
-
+		model.addAttribute("mdto",mdto);
 		model.addAttribute("pdto", pdto);
 
 		String[] color = req.getParameterValues("color");		
@@ -190,74 +199,103 @@ public class ProductController {
 	}
 
 	@RequestMapping(value="Makepayment", method=RequestMethod.POST)
-	public String Makepayment(HttpServletRequest req,BuyListDTO bdto) throws Exception {
+	public String Makepayment(HttpServletRequest req,BuyListDTO bdto,OrderDTO odto) throws Exception {
 		MemberDTO dto =(MemberDTO) session.getAttribute("loginInfo");
 		String parent_id = dto.getId();
-		
+		int oseq =pdao.getOrderNextVal();
 		String[] pname = req.getParameterValues("pname");
 		String[] pcolor=req.getParameterValues("pcolor");
 		String[] psize=req.getParameterValues("psize");
 		String[] amount=req.getParameterValues("amount");
-		
+		String[] point = req.getParameterValues("point");
+		int totalPrice = Integer.parseInt(req.getParameter("totalPrice"));
+		int usePoint = Integer.parseInt(req.getParameter("usepoint"));
+
+
 		for(int i=0; i<pcolor.length;i++) {
 			bdto.setPname(pname[i]);
 			bdto.setParent_id(parent_id);
 			bdto.setPcolor(pcolor[i]);
 			bdto.setPsize(psize[i]);
 			bdto.setAmount(Integer.parseInt(amount[i]));
+			bdto.setAddpoint(Integer.parseInt(point[i]));
+			bdto.setOseq(oseq);
 			pservice.BuyList(bdto);
 		}
+		odto.setAmount(totalPrice);
+		odto.setId(parent_id);
+		odto.setOseq(oseq);
+		odto.setUsepoint(usePoint);
+		pservice.orderInsert(odto);
 
 		return "redirect:/";
 	}
 	@RequestMapping("review")
-	   public String Makepayment(HttpServletRequest req,ReviewDTO rdto,MultipartFile file,Model model) throws Exception {
-	      MemberDTO dto =(MemberDTO) session.getAttribute("loginInfo");
-	      String writer = dto.getId();
-	      
-	      String pseq = req.getParameter("pseq");
-	      String title = req.getParameter("title");
-	      String content = req.getParameter("content");
-	      
-	      String filePath = session.getServletContext().getRealPath("upload");
+	public String Makepayment(HttpServletRequest req,ReviewDTO rdto,MultipartFile file,Model model) throws Exception {
+		MemberDTO dto =(MemberDTO) session.getAttribute("loginInfo");
+		String writer = dto.getId();
 
-	      String img = "";
-	      File tempFilePath = new File(filePath);
-	      if(!tempFilePath.exists()) {
-	         tempFilePath.mkdir();
-	      }
-	      filePath += "/product";
-	      File temp2 = new File(filePath);
-	      if(!temp2.exists()) {
-	         temp2.mkdir();
-	      }
-	      filePath += "/"+pseq;
-	      File temp3 = new File(filePath);
-	      if(!temp3.exists()) {
-	         temp3.mkdir();
-	      }
-	      filePath += "/review";
-	      File temp4 = new File(filePath);
-	      if(!temp4.exists()) {
-	         System.out.println(temp4);
-	         temp4.mkdir();
-	      }
-	      if(!file.isEmpty()) {
-	         String systemFileName = file.getOriginalFilename();
-	         File targetLoc = new File(filePath + "/" + systemFileName);
-	         file.transferTo(targetLoc);
-	         img = systemFileName;
-	      }
-	      rdto.setPseq(Integer.parseInt(pseq));
-	      rdto.setImg(img);
-	      rdto.setTitle(title);
-	      rdto.setContent(content);
-	      rdto.setWriter(writer);
-	      pservice.Review(rdto);
-	      
-	      return "redirect:/product/productDetail?pseq="+pseq;
-	   }
-	
+		String pseq = req.getParameter("pseq");
+		String title = req.getParameter("title");
+		String content = req.getParameter("content");
+
+		String filePath = session.getServletContext().getRealPath("upload");
+
+		String img = "";
+		File tempFilePath = new File(filePath);
+		if(!tempFilePath.exists()) {
+			tempFilePath.mkdir();
+		}
+		filePath += "/product";
+		File temp2 = new File(filePath);
+		if(!temp2.exists()) {
+			temp2.mkdir();
+		}
+		filePath += "/"+pseq;
+		File temp3 = new File(filePath);
+		if(!temp3.exists()) {
+			temp3.mkdir();
+		}
+		filePath += "/review";
+		File temp4 = new File(filePath);
+		if(!temp4.exists()) {
+			System.out.println(temp4);
+			temp4.mkdir();
+		}
+		if(!file.isEmpty()) {
+			String systemFileName = file.getOriginalFilename();
+			File targetLoc = new File(filePath + "/" + systemFileName);
+			file.transferTo(targetLoc);
+			img = systemFileName;
+		}
+		rdto.setPseq(Integer.parseInt(pseq));
+		rdto.setImg(img);
+		rdto.setTitle(title);
+		rdto.setContent(content);
+		rdto.setWriter(writer);
+		pservice.Review(rdto);
+
+		return "redirect:/product/productDetail?pseq="+pseq;
+	}
+
+	@RequestMapping("question")
+	public String QuestionWrite(HttpServletRequest req, QuestionDTO qdto) throws Exception {
+		MemberDTO dto = (MemberDTO) session.getAttribute("loginInfo");
+		String writer = dto.getId();
+
+		String pseq = req.getParameter("pseq");
+		String title = req.getParameter("title");
+		String content = req.getParameter("content");
+
+		qdto.setPseq(Integer.parseInt(pseq));
+		qdto.setTitle(title);
+		qdto.setContent(content);
+		qdto.setWriter(writer);
+		pservice.Question(qdto);
+
+		return "redirect:/product/productDetail?pseq=" + pseq;
+	}
+
 	@RequestMapping(value="memberInfo",produces="application/text;charset=UTF-8")
 	@ResponseBody
 	public String memberInfo() {
@@ -269,6 +307,67 @@ public class ProductController {
 		obj.addProperty("email2", email[1]);
 		obj.addProperty("member", member.toJson(mdto));
 		return obj.toString();
+	}
+	@RequestMapping("reviewdelete") 
+	public String ReviewDelete(HttpServletRequest req) throws Exception { 
+		int bno = Integer.parseInt(req.getParameter("bno"));
+		int pseq = Integer.parseInt(req.getParameter("pseq"));
+		pservice.ReviewDelete(bno);
+		return "redirect:/product/productDetail?pseq="+pseq; 
+	}
+
+	@RequestMapping("questiondelete")
+	public String questiondelete(HttpServletRequest req) throws Exception { 
+		int bno = Integer.parseInt(req.getParameter("bno"));
+		int pseq = Integer.parseInt(req.getParameter("pseq"));
+		pservice.QuestionDelete(bno);
+		return "redirect:/product/productDetail?pseq="+pseq; 
+	}
+
+	@RequestMapping("reviewupdate")
+	public String reviewupdate(HttpServletRequest req, MultipartFile file, ReviewDTO rdto) throws Exception { 
+		int bno = Integer.parseInt(req.getParameter("bno"));
+		int pseq = Integer.parseInt(req.getParameter("pseq"));
+		String title = req.getParameter("title");
+		String content = req.getParameter("content");
+		String writer = req.getParameter("writer");	
+		String reviewimg = req.getParameter("reviewimg");	
+		String img = "";
+		
+		if(file!=null) {
+			String filePath = session.getServletContext().getRealPath("upload/product/"+pseq+"/review");
+			File folder = new File(filePath);
+			System.out.println(filePath);
+
+			File[] folder_list = folder.listFiles(); 
+
+			for (int j = 0; j < folder_list.length; j++) {
+				if(folder_list[j].equals(reviewimg)) {
+					folder_list[j].delete(); 
+				}
+			}
+			if(!file.getOriginalFilename().contentEquals(reviewimg)) {
+				if (!file.isEmpty()) {
+					String systemFileName = file.getOriginalFilename();
+					File targetLoc = new File(filePath + "/" + systemFileName);
+					file.transferTo(targetLoc);
+					img = systemFileName;
+				}
+			}
+			if(img.contentEquals("")) {
+				img = reviewimg;
+			}
+		}
+		rdto.setImg(img);
+		rdto.setBno(bno);
+		rdto.setPseq(pseq);	
+		rdto.setPseq(pseq);
+		rdto.setTitle(title);
+		rdto.setContent(content);
+		rdto.setWriter(writer);
+
+		pservice.ReviewUpdate(rdto);
+		return "redirect:/product/productDetail?pseq="+pseq; 
 	}
 
 }

@@ -12,7 +12,9 @@ import osf.spring.dto.BuyListDTO;
 import osf.spring.dto.CartDTO;
 import osf.spring.dto.ImageDTO;
 import osf.spring.dto.OptionDTO;
+import osf.spring.dto.OrderDTO;
 import osf.spring.dto.ProductDTO;
+import osf.spring.dto.QuestionDTO;
 import osf.spring.dto.ReviewDTO;
 
 @Repository
@@ -23,6 +25,9 @@ public class ProductDAO {
 
 	public int getNextVal() {
 		return mybatis.selectOne("Product.product_nextval");		
+	}
+	public int getOrderNextVal() {
+		return mybatis.selectOne("Product.order_nextval");		
 	}
 
 	public void productRegist(ProductDTO dto) {
@@ -67,4 +72,22 @@ public class ProductDAO {
 	public List<ReviewDTO> ReviewtByPseq(int pseq) {
 		return mybatis.selectList("Product.reviewSelectByPseq", pseq);
 	}	
+	public int orderInsert(OrderDTO odto) {
+		return mybatis.insert("Product.orderInsert",odto);
+	}
+	public int question(QuestionDTO qdto) {
+		return mybatis.insert("Product.question", qdto);
+	}
+	public List<QuestionDTO> QuestioByPseq(int pseq) {
+		return mybatis.selectList("Product.questionSelectByPseq", pseq);
+	}
+	public int reviewdelete(int bno) { 
+		return mybatis.delete("Product.reviewDelete", bno); 
+	}
+	public int questiondelete(int bno) { 
+		return mybatis.delete("Product.questiondelete", bno); 
+	}
+	public int reviewupdate(ReviewDTO rdto) {
+		return mybatis.update("Product.reviewupdate", rdto);
+	}
 }

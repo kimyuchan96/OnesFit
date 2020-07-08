@@ -20,12 +20,14 @@ public class BuyListDTO {
 	private Timestamp buy_date;
 	private String send_money_yn;
 	private int send_number;
+	private int addpoint;
+	private int oseq;
 	
 	public BuyListDTO() {}
 
 	public BuyListDTO(String parent_id, String pname, int price, String psize, String pcolor, int amount,
 			String recipient, int zipcode, String address1, String address2, String phone, String msg, String status,
-			int buy_num, Timestamp buy_date, String send_money_yn, int send_number) {
+			int buy_num, Timestamp buy_date, String send_money_yn, int send_number,int addpoint,int oseq) {
 		super();
 		this.parent_id = parent_id;
 		this.pname = pname;
@@ -44,6 +46,8 @@ public class BuyListDTO {
 		this.buy_date = buy_date;
 		this.send_money_yn = send_money_yn;
 		this.send_number = send_number;
+		this.addpoint= addpoint;
+		this.oseq = oseq;
 	}
 
 	public String getParent_id() {
@@ -181,6 +185,24 @@ public class BuyListDTO {
 	public void setSend_number(int send_number) {
 		this.send_number = send_number;
 	}
+
+	public int getAddpoint() {
+		return addpoint;
+	}
+
+	public void setAddpoint(int addpoint) {
+		this.addpoint = addpoint;
+	}
+
+	public int getOseq() {
+		return oseq;
+	}
+
+	public void setOseq(int oseq) {
+		this.oseq = oseq;
+	}
+	
+	
 	
 	
 }

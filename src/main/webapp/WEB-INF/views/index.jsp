@@ -167,7 +167,7 @@ div {
 
                <div id="sidemenu">
                   <div id="sidefix">
-                     <a href=""> <img src="resources/images/logo.png"
+                     <a href=""> <img src="img/logo.png"
                         style="width: 130px; position: relative; left: 45px">
                      </a>
                      <div class="memberpage">
@@ -195,16 +195,16 @@ div {
 
                      <div>
                         <ul>
-                           <li><a href=""><img src="resources/images/search.png"
+                           <li><a href=""><img src="img/search.png"
                                  style="width: 15px"></a> <input id="search" type="text">
 
                            </li>
                         </ul>
                         <ul>
-                           <li><a href=""><img src="resources/images/instar.png"
+                           <li><a href=""><img src="img/instar.png"
                                  width="20px"
                                  style="position: relative; top: 6px; border-radius: 9px"></a>
-                              <a href=""><img src="resources/images/kakao.png"
+                              <a href=""><img src="img/kakao.png"
                                  width="20px"
                                  style="position: relative; top: 6px; border-radius: 9px"></a>
                            </li>
@@ -223,7 +223,7 @@ div {
                            <li class="box_li">
                               <div class="box_div">
                                  <a href="/product/productDetail?pseq=${i.pseq }"><img
-                                    src="/mainpic/${i.title_img }"></a>
+                                    src="/title/${i.title_img }"></a>
                                  <ul class="product_info">
                                     <li>${i.pname }</li>
                                     <li>${i.price }</li>

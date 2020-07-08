@@ -11,7 +11,9 @@ import osf.spring.dto.BuyListDTO;
 import osf.spring.dto.CartDTO;
 import osf.spring.dto.ImageDTO;
 import osf.spring.dto.OptionDTO;
+import osf.spring.dto.OrderDTO;
 import osf.spring.dto.ProductDTO;
+import osf.spring.dto.QuestionDTO;
 import osf.spring.dto.ReviewDTO;
 
 @Service
@@ -22,11 +24,11 @@ public class ProductService {
 
 	@Transactional("txManager")
 	public void productRegist(ProductDTO pdto,List<ImageDTO> imageList) {
-		int seq=pdao.getNextVal();
-		pdto.setPseq(seq);
+//		int seq=pdao.getNextVal();
+//		pdto.setPseq(seq);
 		pdao.productRegist(pdto);
 		for(ImageDTO dto : imageList) {
-			dto.setProduct_seq(seq);
+			dto.setProduct_seq(pdto.getPseq());
 			pdao.imageRegist(dto);
 		}
 	}
@@ -62,5 +64,24 @@ public class ProductService {
 	}
 	public int Review(ReviewDTO rdto) {
 		return pdao.review(rdto);
+	}
+	public int orderInsert(OrderDTO odto) {
+		return pdao.orderInsert(odto);
+	}
+	public int Question(QuestionDTO qdto) {
+		return pdao.question(qdto);	
+	}
+	public List<QuestionDTO> QuestionByPseq(int pseq) {
+		return pdao.QuestioByPseq(pseq);
+	}
+
+	public int ReviewDelete(int bno) { 
+		return pdao.reviewdelete(bno); 
+	}
+	public int QuestionDelete(int bno) { 
+		return pdao.questiondelete(bno); 
+	}
+	public int ReviewUpdate(ReviewDTO rdto) {
+		return pdao.reviewupdate(rdto);
 	}
 }

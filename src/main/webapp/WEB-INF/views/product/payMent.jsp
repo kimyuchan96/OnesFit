@@ -30,6 +30,11 @@
 	window.onload = function() { //실행될 코드 }
 		$(".sum").val(${sum});
 		$(".totalPrice").val(${sum}+3000);
+		$(".point").each(function(){
+			var point1 = Math.floor($(this).val());
+			$(this).val(point1);
+		})
+	
 	}
 	</script>
 </head>
@@ -258,10 +263,20 @@ div {
 	outline: 0;
 	width: 35px;
 }
+.point {
+	border: 0px;
+	outline: 0;
+	width: 35px;
+}
+.discount {
+	border: 0px;
+	outline: 0;
+	width: 35px;
+}
+
 .totalPrice {
 	border: 0px;
 	outline: 0;
-
 }
 </style>
 <body>
@@ -273,7 +288,7 @@ div {
 			<!--               사이드메뉴-->
 			<div id="sidemenu">
 				<div id="sidefix">
-					<a href=""> <img src="/resources/images/logo.png"
+					<a href=""> <img src="/img/logo.png"
 						style="width: 130px; position: relative; left: 45px">
 					</a>
 					<div class="memberpage">
@@ -300,18 +315,16 @@ div {
 
 					<div>
 						<ul>
-							<li><a href=""><img src="/resources/images/search.png"
+							<li><a href=""><img src="/img/search.png"
 									style="width: 15px"></a> <input id="search" type="text">
 
 							</li>
 						</ul>
 						<ul>
 
-							<li><a href=""><img src="/resources/images/instar.png"
-									width="20px"
+							<li><a href=""><img src="/img/instar.png" width="20px"
 									style="position: relative; top: 6px; border-radius: 9px"></a>
-								<a href=""><img src="/resources/images/kakao.png"
-									width="20px"
+								<a href=""><img src="/img/kakao.png" width="20px"
 									style="position: relative; top: 6px; border-radius: 9px"></a>
 							</li>
 						</ul>
@@ -358,7 +371,7 @@ div {
 											<td><input type="checkbox" class='selectPro'></td>
 											<td>
 												<div>
-													<img src="/mainpic/${pdto.title_img }" style="width: 100%">
+													<img src="/title/${pdto.title_img }" style="width: 100%">
 												</div>
 											</td>
 											<td><input type="text" class="pinput" name="pname"
@@ -375,7 +388,9 @@ div {
 											<td><input type="text" class="pinput" name="amount"
 												value="${list3[status.index]}" style="width: 30px"
 												readonly="readonly"></td>
-											<td>0</td>
+											<td><input type="text" class="pinput point" name="point"
+												 value="${list3[status.index]*pdto.price*0.02}" style="width: 30px"
+												readonly="readonly"></td>
 											<td class='amount'>${list3[status.index] *pdto.price }</td>
 										</tr>
 									</c:forEach>
@@ -383,9 +398,12 @@ div {
 
 								<tfoot>
 									<tr>
+										<td colspan="7" style='text-align:right'>[적립금 사용]<input type=text id='point' name='usepoint' maxlength="5" > 보유 적립금 : ${mdto.point } 원
+									</tr>
+									<tr>
 										<td colspan="7" style="text-align: right;">[기본배송] 상품구매금액
 											<input type=text class='sum' readonly>+ 배송비 3,000 -
-											상품할인금액 0 = 합계 :<input type='text' class='totalPrice' readonly>
+											상품할인금액<input type=text class='discount' readonly> = 합계 :<input type='text' class='totalPrice' readonly>
 										</td>
 									</tr>
 								</tfoot>
@@ -415,10 +433,11 @@ div {
 											<td>
 												<div class="address">
 													<input type="button" class="obtn" value="회원 정보와 동일 "
-														id='memberInput'> <input type='reset' class="obtn"
-														value="새로운 배송지"> <input type="button" class="obtn"
-														value="최근 배송지 "> <a href=""><input
-														type="button" class="obtn" value="주소록 보기 "></a>
+														id='memberInput'> <input type='button'
+														class="obtn" value="새로운 배송지" id='newAdd'> <input
+														type="button" class="obtn" value="최근 배송지 "> <a
+														href=""><input type="button" class="obtn"
+														value="주소록 보기 "></a>
 												</div>
 											</td>
 										</tr>
@@ -515,14 +534,17 @@ div {
 										<tr>
 											<td>
 												<div>
-													<strong>KRW ${sum+3000 }</strong>
+													<strong>KRW <input type='text' class='totalPrice'
+														readonly style="font-weight: bold; text-align: center;"></strong>
 												</div>
 											</td>
 											<td><div>
-													<strong>-</strong> <strong>0원</strong>
+													<strong>-</strong> <strong><input type=text class='discount' readonly style="font-weight: bold; text-align: center;"></strong>
 												</div></td>
 											<td><div>
-													<strong>=</strong> <strong>${sum+3000 } 원</strong>
+													<strong>=</strong> <strong><input type='text'
+														class='totalPrice' readonly
+														style="font-weight: bold; text-align: center;"> 원</strong>
 												</div></td>
 										</tr>
 									</tbody>
@@ -541,7 +563,7 @@ div {
 
 										<p class="price" style="font-size: 20px">
 											KRW<input style="text-align: right; border: 0px;" size="5"
-												readonly="1" class='totalPrice' type="text">
+												readonly="1" class='totalPrice' name='totalPrice' type="text">
 										</p>
 										<input id="radio" type="checkbox" class="checkbox"> <label>결제정보를
 											확인하였으며, 구매진행에 동의합니다.</label>
@@ -879,11 +901,30 @@ div {
 							money += Number(amount[i]);					
 						}
 						$(".sum").val(money);
-						$(".totalPrice").val(money+3000);
+						$(".totalPrice").val(money-$(".discount").val()+3000);
 					}else{
 						location.href="/";
 					}
 				})
+			}
+		})
+		$("#newAdd").on("click",function(){
+			$("#zipcode").val('');
+			$("#add1").val('');
+			$("#add2").val('');
+		})
+		$("#point").on("propertychange change keyup paste input",function(){
+			var discount = $(".discount").val();	
+			var sum = $(".sum").val();
+			 $(this).val($(this).val().replace(/[^0-9]/g,""));
+			if($(this).val()<0 || $(this).val()>${mdto.point}){
+				alert("잘못된 입력 또는 적립금이 부족합니다.");
+				$(this).val('');	
+				$(".discount").val('');
+				$(".totalPrice").val(Number(sum)+3000);
+			}else{
+				$(".discount").val($(this).val());
+				$(".totalPrice").val(sum-discount+3000);
 			}
 		})
 	</script>
