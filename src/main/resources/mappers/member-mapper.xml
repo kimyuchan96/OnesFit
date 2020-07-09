@@ -8,4 +8,8 @@
 	<select id="mypage" resultType="osf.spring.dto.MemberDTO">
 		select *from member where id=#{value}
 	</select>
+	
+	<select id="selectAddressList" resultType="osf.spring.dto.LocketListDTO">
+		select *from locketlist where id=#{id}
+	</select>
 </mapper>

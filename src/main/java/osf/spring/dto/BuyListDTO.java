@@ -3,6 +3,7 @@ package osf.spring.dto;
 import java.sql.Timestamp;
 
 public class BuyListDTO {
+	private int bseq;
 	private String parent_id;
 	private String pname;
 	private int price;
@@ -16,7 +17,7 @@ public class BuyListDTO {
 	private String phone;
 	private String msg;
 	private String status;
-	private int buy_num;
+	private int product_num;
 	private Timestamp buy_date;
 	private String send_money_yn;
 	private int send_number;
@@ -25,10 +26,11 @@ public class BuyListDTO {
 	
 	public BuyListDTO() {}
 
-	public BuyListDTO(String parent_id, String pname, int price, String psize, String pcolor, int amount,
+	public BuyListDTO(int bseq,String parent_id, String pname, int price, String psize, String pcolor, int amount,
 			String recipient, int zipcode, String address1, String address2, String phone, String msg, String status,
-			int buy_num, Timestamp buy_date, String send_money_yn, int send_number,int addpoint,int oseq) {
+			int product_num, Timestamp buy_date, String send_money_yn, int send_number,int addpoint,int oseq) {
 		super();
+		this.bseq = bseq;
 		this.parent_id = parent_id;
 		this.pname = pname;
 		this.price = price;
@@ -42,12 +44,22 @@ public class BuyListDTO {
 		this.phone = phone;
 		this.msg = msg;
 		this.status = status;
-		this.buy_num = buy_num;
+		this.product_num = product_num;
 		this.buy_date = buy_date;
 		this.send_money_yn = send_money_yn;
 		this.send_number = send_number;
 		this.addpoint= addpoint;
 		this.oseq = oseq;
+	}
+	
+	
+
+	public int getBseq() {
+		return bseq;
+	}
+
+	public void setBseq(int bseq) {
+		this.bseq = bseq;
 	}
 
 	public String getParent_id() {
@@ -154,12 +166,12 @@ public class BuyListDTO {
 		this.status = status;
 	}
 
-	public int getBuy_num() {
-		return buy_num;
+	public int getProduct_num() {
+		return product_num;
 	}
 
-	public void setBuy_num(int buy_num) {
-		this.buy_num = buy_num;
+	public void setProduct_num(int product_num) {
+		this.product_num = product_num;
 	}
 
 	public Timestamp getBuy_date() {

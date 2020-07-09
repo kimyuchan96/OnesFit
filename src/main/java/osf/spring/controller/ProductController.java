@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -199,7 +200,8 @@ public class ProductController {
 	}
 
 	@RequestMapping(value="Makepayment", method=RequestMethod.POST)
-	public String Makepayment(HttpServletRequest req,BuyListDTO bdto,OrderDTO odto) throws Exception {
+	@Transactional("txManager")
+	public String Makepayment(HttpServletRequest req,BuyListDTO bdto) throws Exception {
 		MemberDTO dto =(MemberDTO) session.getAttribute("loginInfo");
 		String parent_id = dto.getId();
 		int oseq =pdao.getOrderNextVal();
@@ -209,10 +211,13 @@ public class ProductController {
 		String[] amount=req.getParameterValues("amount");
 		String[] point = req.getParameterValues("point");
 		int totalPrice = Integer.parseInt(req.getParameter("totalPrice"));
-		int usePoint = Integer.parseInt(req.getParameter("usepoint"));
+		int product_num = Integer.parseInt(req.getParameter("product_num"));
+		int usePoint = 0;
+		try{usePoint=Integer.parseInt(req.getParameter("usepoint"));}catch(Exception e) {usePoint=0;}
 
 
 		for(int i=0; i<pcolor.length;i++) {
+			bdto.setProduct_num(product_num);
 			bdto.setPname(pname[i]);
 			bdto.setParent_id(parent_id);
 			bdto.setPcolor(pcolor[i]);
@@ -220,19 +225,21 @@ public class ProductController {
 			bdto.setAmount(Integer.parseInt(amount[i]));
 			bdto.setAddpoint(Integer.parseInt(point[i]));
 			bdto.setOseq(oseq);
-			pservice.BuyList(bdto);
+			pservice.BuyList(bdto);			
 		}
+		OrderDTO odto = new OrderDTO();
 		odto.setAmount(totalPrice);
 		odto.setId(parent_id);
 		odto.setOseq(oseq);
 		odto.setUsepoint(usePoint);
-		pservice.orderInsert(odto);
-
+		pservice.orderInsert(odto);	
+		dto.setPoint(pservice.selectPoint(parent_id));
 		return "redirect:/";
 	}
 	@RequestMapping("review")
-	public String Makepayment(HttpServletRequest req,ReviewDTO rdto,MultipartFile file,Model model) throws Exception {
-		MemberDTO dto =(MemberDTO) session.getAttribute("loginInfo");
+	public String Makepayment(HttpServletRequest req, ReviewDTO rdto, MultipartFile file, Model model)
+			throws Exception {
+		MemberDTO dto = (MemberDTO) session.getAttribute("loginInfo");
 		String writer = dto.getId();
 
 		String pseq = req.getParameter("pseq");
@@ -243,26 +250,26 @@ public class ProductController {
 
 		String img = "";
 		File tempFilePath = new File(filePath);
-		if(!tempFilePath.exists()) {
+		if (!tempFilePath.exists()) {
 			tempFilePath.mkdir();
 		}
 		filePath += "/product";
 		File temp2 = new File(filePath);
-		if(!temp2.exists()) {
+		if (!temp2.exists()) {
 			temp2.mkdir();
 		}
-		filePath += "/"+pseq;
+		filePath += "/" + pseq;
 		File temp3 = new File(filePath);
-		if(!temp3.exists()) {
+		if (!temp3.exists()) {
 			temp3.mkdir();
 		}
 		filePath += "/review";
 		File temp4 = new File(filePath);
-		if(!temp4.exists()) {
+		if (!temp4.exists()) {
 			System.out.println(temp4);
 			temp4.mkdir();
 		}
-		if(!file.isEmpty()) {
+		if (!file.isEmpty()) {
 			String systemFileName = file.getOriginalFilename();
 			File targetLoc = new File(filePath + "/" + systemFileName);
 			file.transferTo(targetLoc);
@@ -275,7 +282,7 @@ public class ProductController {
 		rdto.setWriter(writer);
 		pservice.Review(rdto);
 
-		return "redirect:/product/productDetail?pseq="+pseq;
+		return "redirect:/product/productDetail?pseq=" + pseq;
 	}
 
 	@RequestMapping("question")
@@ -308,6 +315,8 @@ public class ProductController {
 		obj.addProperty("member", member.toJson(mdto));
 		return obj.toString();
 	}
+
+
 	@RequestMapping("reviewdelete") 
 	public String ReviewDelete(HttpServletRequest req) throws Exception { 
 		int bno = Integer.parseInt(req.getParameter("bno"));
@@ -330,17 +339,14 @@ public class ProductController {
 		int pseq = Integer.parseInt(req.getParameter("pseq"));
 		String title = req.getParameter("title");
 		String content = req.getParameter("content");
-		String writer = req.getParameter("writer");	
-		String reviewimg = req.getParameter("reviewimg");	
+		String writer = req.getParameter("writer");   
+		String reviewimg = req.getParameter("reviewimg");   
+
 		String img = "";
-		
 		if(file!=null) {
 			String filePath = session.getServletContext().getRealPath("upload/product/"+pseq+"/review");
 			File folder = new File(filePath);
-			System.out.println(filePath);
-
 			File[] folder_list = folder.listFiles(); 
-
 			for (int j = 0; j < folder_list.length; j++) {
 				if(folder_list[j].equals(reviewimg)) {
 					folder_list[j].delete(); 
@@ -360,14 +366,16 @@ public class ProductController {
 		}
 		rdto.setImg(img);
 		rdto.setBno(bno);
-		rdto.setPseq(pseq);	
+		rdto.setPseq(pseq);   
 		rdto.setPseq(pseq);
 		rdto.setTitle(title);
 		rdto.setContent(content);
 		rdto.setWriter(writer);
 
 		pservice.ReviewUpdate(rdto);
+
 		return "redirect:/product/productDetail?pseq="+pseq; 
 	}
-
+	
+	
 }

@@ -64,7 +64,18 @@ public class ProductDAO {
 	}
 	public int buyList(BuyListDTO bdto) {
 		return mybatis.insert("Product.buyList", bdto);
-
+	}
+	public int addPoint(BuyListDTO bdto) {
+		return mybatis.insert("Product.addpoint", bdto);
+	}
+	public int orderInsert(OrderDTO odto) {
+		return mybatis.insert("Product.orderInsert",odto);
+	}
+	public int usepoint(OrderDTO odto) {
+		return mybatis.insert("Product.usepoint", odto);
+	}
+	public int selectPoint(String id) {
+		return mybatis.selectOne("Product.selectPoint", id);
 	}
 	public int review(ReviewDTO rdto) {
 		return mybatis.insert("Product.review", rdto);
@@ -72,9 +83,6 @@ public class ProductDAO {
 	public List<ReviewDTO> ReviewtByPseq(int pseq) {
 		return mybatis.selectList("Product.reviewSelectByPseq", pseq);
 	}	
-	public int orderInsert(OrderDTO odto) {
-		return mybatis.insert("Product.orderInsert",odto);
-	}
 	public int question(QuestionDTO qdto) {
 		return mybatis.insert("Product.question", qdto);
 	}

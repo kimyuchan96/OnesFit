@@ -3,12 +3,14 @@ package osf.spring.service;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import osf.spring.dao.MemberDAO;
+import osf.spring.dto.LocketListDTO;
 import osf.spring.dto.MemberDTO;
 
 @Service
@@ -42,5 +44,9 @@ public class MemberService {
 	public MemberDTO mypage(String id){
 		MemberDTO mdto = mdao.mypage(id);
 		return mdto;
+	}
+	
+	public List<LocketListDTO> selectAddressList(String id){
+		return mdao.selectAddressList(id);
 	}
 }

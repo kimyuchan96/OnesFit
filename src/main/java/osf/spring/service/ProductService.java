@@ -24,8 +24,8 @@ public class ProductService {
 
 	@Transactional("txManager")
 	public void productRegist(ProductDTO pdto,List<ImageDTO> imageList) {
-//		int seq=pdao.getNextVal();
-//		pdto.setPseq(seq);
+		//		int seq=pdao.getNextVal();
+		//		pdto.setPseq(seq);
 		pdao.productRegist(pdto);
 		for(ImageDTO dto : imageList) {
 			dto.setProduct_seq(pdto.getPseq());
@@ -56,17 +56,25 @@ public class ProductService {
 	public List<OptionDTO> colorSelect(int pseq,String color){
 		return pdao.colorSelect(pseq,color);
 	}
+	@Transactional("txManager")
 	public int BuyList(BuyListDTO bdto) {
-		return pdao.buyList(bdto);
-	}
+		pdao.addPoint(bdto);
+		return pdao.buyList(bdto);		
+	}	
+	
 	public List<ReviewDTO> ReviewtByPseq(int pseq) {
 		return pdao.ReviewtByPseq(pseq);
 	}
 	public int Review(ReviewDTO rdto) {
 		return pdao.review(rdto);
 	}
+	@Transactional("txManager")
 	public int orderInsert(OrderDTO odto) {
+		pdao.usepoint(odto);
 		return pdao.orderInsert(odto);
+	}
+	public int selectPoint(String id) {
+		return pdao.selectPoint(id);
 	}
 	public int Question(QuestionDTO qdto) {
 		return pdao.question(qdto);	
